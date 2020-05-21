@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/csv"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -196,7 +197,15 @@ func ReadSchema(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
-	err = d.Set("data_retention_days", s.RetentionTime.Int64)
+	i := int64(0)
+	if s.RetentionTime.String != "" {
+		i, err = strconv.ParseInt(s.RetentionTime.String, 10, 64)
+		if err != nil {
+			return err
+		}
+	}
+
+	err = d.Set("data_retention_days", i)
 	if err != nil {
 		return err
 	}
